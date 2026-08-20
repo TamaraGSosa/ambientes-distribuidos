@@ -14,7 +14,7 @@ El sistema permite realizar operaciones matemáticas de forma remota. El cliente
 * `java.io`
 * Sockets TCP
 
-## 📂 Estructura del proyecto
+##  Estructura del proyecto
 
 ```text
 clase-tp1-13-08-2026-/
@@ -53,7 +53,7 @@ Cliente → 15;/;0
 Servidor → ERROR: Division por cero
 ```
 
-## ▶ Ejecución
+##  Ejecución
 
 ### 1. Iniciar el servidor
 
@@ -77,7 +77,7 @@ localhost:5500
 
 Luego envía la operación y recibe el resultado.
 
-## 🧪 Pruebas realizadas
+##  Pruebas realizadas
 
 ### Suma
 
@@ -128,7 +128,7 @@ ERROR: Division por cero
 
 ![alt text](image-2.png)
 
-## 📚 Conclusión
+##  Conclusión
 
 La práctica permitió comprender el funcionamiento básico de una arquitectura Cliente-Servidor y la comunicación entre procesos mediante sockets TCP.
 
