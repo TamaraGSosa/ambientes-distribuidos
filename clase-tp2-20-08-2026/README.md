@@ -97,7 +97,7 @@ Luego de aplicar el tiempo de espera correspondiente mediante Backoff Exponencia
 
 ![Métricas de resiliencia](metricas.png)
 
-# Ejercicio 3: Análisis Teórico
+# Ejercicio 3: 
 
 ## ¿Qué problema genera en un servidor saturado que todos los clientes reintenten sus peticiones exactamente al mismo tiempo y con intervalos fijos (sin Jitter)?
 
@@ -133,19 +133,6 @@ El servidor utilizado corresponde al desarrollado en la Clase 1.
 
 No fue necesario modificar el servidor para implementar la estrategia de resiliencia solicitada.
 
-## Capturas de la ejecución
-
-### Captura 1 — Reintentos y Jitter
-
-![Reintentos y Jitter](jitter_fallo.png)
-
-### Captura 2 — Recuperación de un error
-
-![Recuperación de un error](recuperacion.png)
-
-### Captura 3 — Ejecución exitosa y métricas
-
-![Ejecución exitosa y métricas](metricas.png)
 
 # Conclusión
 
