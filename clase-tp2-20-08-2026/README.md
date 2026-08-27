@@ -19,7 +19,7 @@ Se modificó el cliente para incorporar reintentos mediante **Backoff Exponencia
 ## Estructura del proyecto
 
 ```text
-TP2/
+clase-tp2-20-08-2026/
 ├── ClienteResiliente.java
 ├── README.md
 ├── jitter_fallo.png
