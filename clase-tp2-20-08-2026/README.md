@@ -46,7 +46,8 @@ long backoff = BASE * (long) Math.pow(2, intento - 1);
 long jitter = ThreadLocalRandom.current().nextLong(0, 501);
 
 long tiempoEspera = backoff + jitter;
-Captura — Reintentos y Jitter
+
+### Captura — Reintentos y Jitter
 
 ![Reintentos y Jitter](jitter_fallo.png)
 
@@ -75,13 +76,13 @@ Se realizó una prueba en la que el primer intento produjo un error de comunicac
 
 Luego de aplicar el tiempo de espera correspondiente, el cliente realizó un segundo intento y logró comunicarse correctamente con el servidor.
 
-Captura — Recuperación en el segundo intento
+### Captura — Recuperación en el segundo intento
 
-![Recuperación](recuperacion.png)
+![Recuperación de un error](recuperacion.png)
 
-Captura — Ejecución exitosa y métricas
+### Captura — Ejecución exitosa y métricas
+
 ![Métricas](metricas.png)
-
 Ejercicio 3: Análisis Teórico
 ¿Qué problema genera en un servidor saturado que todos los clientes reintenten sus peticiones exactamente al mismo tiempo y con intervalos fijos (sin Jitter)?
 
