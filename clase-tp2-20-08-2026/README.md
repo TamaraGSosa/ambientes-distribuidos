@@ -125,9 +125,7 @@ Un **fallo permanente** es un error que no se soluciona esperando ni realizando 
 
 **Ejemplo:** un cliente solicita un recurso que no existe en el servidor. Realizar nuevos intentos no hará que el recurso aparezca.
 
-# Formato de Entrega
-
-El trabajo se incorporó al repositorio de GitHub/GitLab creado en la Clase 1 dentro de una carpeta denominada `TP2`.
+# Nota :
 
 El servidor utilizado corresponde al desarrollado en la Clase 1.
 
