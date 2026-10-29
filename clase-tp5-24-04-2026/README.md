@@ -72,6 +72,5 @@ La comunicación entre los actores se realiza mediante mensajes asincrónicos. E
 
 ### Ejecución del programa
 
-Agregar una captura de Visual Studio Code donde se observe el procesamiento de los mensajes y el resultado final.
 
 ![Ejecución del TP5](evidencias/ejecucion-tp5.png)
