@@ -73,4 +73,4 @@ La comunicación entre los actores se realiza mediante mensajes asincrónicos. E
 ### Ejecución del programa
 
 
-![Ejecución del TP5](evidencias/ejecucion-tp5.png)
+![Ejecución tp 5 ](evidencias/ejecucion-tp-5.png)
