@@ -16,7 +16,6 @@ TP6/
 │   ├── ServicioRemotoImpl.java
 │   ├── Servidor.java
 │   └── Cliente.java
-├── out/
 ├── evidencias/
 │   ├── servidor.png
 │   └── cliente.png
