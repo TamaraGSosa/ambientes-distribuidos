@@ -17,8 +17,8 @@ TP6/
 │   ├── Servidor.java
 │   └── Cliente.java
 ├── evidencias/
-│   ├── servidor.png
-│   └── cliente.png
+│   ├── servidor-e.png
+│   └── cliente-e.png
 └── README.md
 ```
 
@@ -61,11 +61,11 @@ El cliente muestra un menú con las siguientes opciones:
 
 ### Ejecución del servidor
 
-![Ejecución del servidor](evidencias/servidor.png)
+![Ejecución del servidor](evidencias/servidor-e.png)
 
 ### Ejecución del cliente
 
-![Ejecución del cliente](evidencias/cliente.png)
+![Ejecución del cliente](evidencias/cliente-e.png)
 
 
 # 7. Cuestionario teórico y análisis de arquitectura
