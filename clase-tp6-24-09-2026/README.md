@@ -60,11 +60,12 @@ El cliente muestra un menú con las siguientes opciones:
 ## 6. Evidencias
 
 ### Ejecución del servidor
+
 ![Ejecución del servidor](evidencias/servidor.png)
 
 ### Ejecución del cliente
-![Ejecución del cliente](evidencias/cliente.png)
 
+![Ejecución del cliente](evidencias/cliente.png)
 
 
 # 7. Cuestionario teórico y análisis de arquitectura
