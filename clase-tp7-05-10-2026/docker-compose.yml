@@ -1,0 +1,26 @@
+services:
+  servidor:
+    build:
+      context: ./servidor
+    container_name: reservacancha_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./servidor:/app
+      - ./servidor/data:/app/data
+    restart: unless-stopped
+
+  cliente:
+    build:
+      context: ./cliente
+    container_name: reservacancha_web
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_PROXY_TARGET=http://servidor:8000
+    volumes:
+      - ./cliente:/app
+      - /app/node_modules
+    depends_on:
+      - servidor
+    restart: unless-stopped
