@@ -102,7 +102,7 @@ clase-tp7-05-10-2026/
 │   │   │   └── reserva_service.py
 │   │   └── main.py
 │   ├── data/
-│   │   └── reservas.db
+│   │   └── reservas.db          # Base SQLite local (excluida de Git mediante .gitignore)
 │   ├── .dockerignore
 │   ├── Dockerfile
 │   └── requirements.txt
@@ -141,8 +141,10 @@ clase-tp7-05-10-2026/
 │   └── vite.config.ts
 ├── evidencias/
 │   ├── evidencia-202-created.png
-│   ├── json-error-409-fecha-hora.png
+│   ├── payload-created.png
 │   ├── error-409-fecha-hora.png
+│   ├── json-error-409-fecha-hora.png
+│   ├── response-409-error.png
 │   ├── error-422.png
 │   └── error-fecha-422.png
 ├── docker-compose.yml
@@ -276,6 +278,11 @@ El proyecto puede ejecutarse de dos maneras: mediante **Docker Compose** (levant
 
 *(En este modo, el contenedor `reservacancha_web` utiliza la variable de entorno `VITE_API_PROXY_TARGET=http://servidor:8000` definida en `docker-compose.yml` para encaminar las peticiones `/api` hacia el contenedor `reservacancha_api`).*
 
+> **Nota sobre la persistencia de la base de datos SQLite (`servidor/data/reservas.db`):**
+> - El archivo `servidor/data/reservas.db` y sus archivos auxiliares (`-journal`, `-wal`, `-shm`) son **locales del entorno de ejecución** y están excluidos del control de versiones en `.gitignore` y de la imagen Docker en `servidor/.dockerignore`.
+> - Si `servidor/data/reservas.db` ya existe en la máquina local, tanto la ejecución local como el volumen `./servidor/data:/app/data` de `docker-compose.yml` reutilizan la base de datos y sus registros existentes sin sobrescribirlos.
+> - En una instalación nueva (donde el archivo aún no existe), la función `inicializar_base_datos()` crea automáticamente el directorio `data/`, el archivo `reservas.db`, las tablas `canchas` y `reservas` y las 3 canchas deportivas iniciales al arrancar el servidor.
+
 ---
 
 ### Opción B — Ejecución local independiente (Sin Docker)
@@ -329,26 +336,46 @@ El proyecto puede ejecutarse de dos maneras: mediante **Docker Compose** (levant
 
 ## 7. Evidencias de ejecución
 
-### Captura 1 — Invocación exitosa (Registro y confirmación de reserva)
-Muestra el panel de **ReservaCancha** conectado al backend activo y la confirmación visual tras registrar una reserva válida mediante `POST /reservas`:
+### 1. Invocación exitosa (`POST /api/reservas` → `HTTP 201 Created`)
+Muestra el encabezado de la solicitud `POST` enviada por el cliente hacia `/api/reservas` con código de respuesta `201 Created`, seguido del cuerpo JSON (`Response`) devuelto por el servidor al persistir la reserva `id: 8`:
 
-![Captura 1 - Invocación exitosa](evidencias/evidencia-202-created.png)
+![Captura 1.1 - Solicitud POST /api/reservas con respuesta HTTP 201 Created](evidencias/evidencia-202-created.png)
 
-### Captura 2 — Estructura de datos JSON (Intercambio HTTP entre Cliente y Servidor)
-Muestra la carga útil y respuesta estructurada en formato JSON devuelta por el endpoint `/reservas`:
+![Captura 1.2 - Cuerpo JSON de respuesta (ReservaResponse) devuelto por el servidor](evidencias/error-409-fecha-hora.png)
 
-![Captura 2 - Estructura de datos JSON](evidencias/json-error-409-fecha-hora.png)
+---
 
-### Captura 3 — Manejo de errores del backend (`HTTP 409 Conflict` y `HTTP 422 Unprocessable Entity`)
+### 2. Estructura de datos JSON
+
+#### 2.1. Carga útil enviada por el cliente (`Request Payload` de `POST /api/reservas`)
+Muestra el objeto JSON serializado y enviado por el cliente con los 5 campos del contrato `ReservaCreate` (`cancha_id`, `cliente`, `fecha`, `hora_inicio`, `hora_fin`):
+
+![Captura 2.1 - Request Payload JSON enviado por el cliente](evidencias/payload-created.png)
+
+#### 2.2. Respuesta JSON (`Response`) de una reserva registrada (`ReservaResponse`)
+Muestra la estructura de datos JSON devuelta por el servidor (`id`, `cancha_id`, `cliente`, `fecha`, `hora_inicio`, `hora_fin`) tras crear la reserva:
+
+![Captura 2.2 - Estructura JSON de respuesta ReservaResponse](evidencias/error-409-fecha-hora.png)
+
+#### 2.3. Estructura JSON (`Response`) de validación de esquemas Pydantic
+Muestra la estructura JSON de error de validación (`detail`, `type`, `loc`, `msg`, `input`, `ctx`) serializada por FastAPI/Pydantic cuando un campo no cumple el esquema `ReservaCreate`:
+
+![Captura 2.3 - Estructura JSON de detalle de validación Pydantic](evidencias/error-fecha-422.png)
+
+---
+
+### 3. Manejo de errores del backend (`HTTP 409 Conflict` y `HTTP 422 Unprocessable Entity`)
 
 #### 3.1. Conflicto de superposición horaria (`HTTP 409 Conflict`)
-Muestra la alerta visual de TailAdmin cuando el backend rechaza una reserva porque la cancha ya se encuentra ocupada en ese rango horario:
+Muestra el encabezado de respuesta `Status Code: 409 Conflict` en `POST /api/reservas` y el cuerpo JSON (`Response`) con el mensaje `"El horario solicitado se superpone con una reserva existente para esa cancha y fecha"`:
 
-![Captura 3.1 - Conflicto de horario HTTP 409](evidencias/error-409-fecha-hora.png)
+![Captura 3.1 - Encabezado HTTP 409 Conflict ante superposición horaria](evidencias/json-error-409-fecha-hora.png)
 
-#### 3.2. Errores de validación de campos (`HTTP 422 Unprocessable Entity`)
-Muestra el mapeo de errores de validación de Pydantic debajo de los campos correspondientes en el formulario:
+![Captura 3.2 - Cuerpo JSON de respuesta del error HTTP 409 Conflict](evidencias/response-409-error.png)
 
-![Captura 3.2 - Error de validación HTTP 422](evidencias/error-422.png)
+#### 3.2. Error de validación de datos (`HTTP 422 Unprocessable Entity`)
+Muestra el encabezado HTTP con código `422 Unprocessable Entity` en `POST /api/reservas` y el cuerpo JSON (`Response`) que identifica el error en `["body", "fecha"]`:
 
-![Captura 3.3 - Error de validación de fecha HTTP 422](evidencias/error-fecha-422.png)
+![Captura 3.3 - Encabezado HTTP 422 Unprocessable Entity](evidencias/error-422.png)
+
+![Captura 3.4 - Cuerpo JSON del error de validación HTTP 422](evidencias/error-fecha-422.png)
