@@ -139,6 +139,12 @@ clase-tp7-05-10-2026/
 │   ├── index.html
 │   ├── package.json
 │   └── vite.config.ts
+├── evidencias/
+│   ├── evidencia-202-created.png
+│   ├── json-error-409-fecha-hora.png
+│   ├── error-409-fecha-hora.png
+│   ├── error-422.png
+│   └── error-fecha-422.png
 ├── docker-compose.yml
 ├── .gitignore
 └── README.md
@@ -323,19 +329,26 @@ El proyecto puede ejecutarse de dos maneras: mediante **Docker Compose** (levant
 
 ## 7. Evidencias de ejecución
 
-> **Nota sobre las capturas de pantalla:** A continuación se estructura el espacio para adjuntar las tres capturas de evidencia solicitadas por la cátedra dentro de la carpeta `evidencias/` del TP7.
+### Captura 1 — Invocación exitosa (Registro y confirmación de reserva)
+Muestra el panel de **ReservaCancha** conectado al backend activo y la confirmación visual tras registrar una reserva válida mediante `POST /reservas`:
 
-### Captura 1 — Invocación exitosa (Consulta y creación de reserva `HTTP 200` / `HTTP 201`)
-Muestra el panel de **ReservaCancha** conectado al backend activo y la confirmación visual (`HTTP 201`) tras registrar una reserva válida mediante `POST /reservas`:
+![Captura 1 - Invocación exitosa](evidencias/evidencia-202-created.png)
 
-![Captura 1 - Invocación exitosa](evidencias/captura1-exito.png)
+### Captura 2 — Estructura de datos JSON (Intercambio HTTP entre Cliente y Servidor)
+Muestra la carga útil y respuesta estructurada en formato JSON devuelta por el endpoint `/reservas`:
 
-### Captura 2 — Estructura de datos JSON (Solicitud y respuesta en DevTools / Swagger)
-Muestra la carga útil JSON (`Request Payload` y `Response`) serializada entre el cliente y el endpoint `/reservas`:
+![Captura 2 - Estructura de datos JSON](evidencias/json-error-409-fecha-hora.png)
 
-![Captura 2 - Estructura JSON](evidencias/captura2-json.png)
+### Captura 3 — Manejo de errores del backend (`HTTP 409 Conflict` y `HTTP 422 Unprocessable Entity`)
 
-### Captura 3 — Manejo de errores del backend (`HTTP 409 Conflict` / `HTTP 422` / Servidor no disponible)
-Muestra la captura y visualización en componentes de alerta de TailAdmin cuando el backend rechaza una reserva por conflicto de horario (`HTTP 409`) o datos inválidos (`HTTP 422`):
+#### 3.1. Conflicto de superposición horaria (`HTTP 409 Conflict`)
+Muestra la alerta visual de TailAdmin cuando el backend rechaza una reserva porque la cancha ya se encuentra ocupada en ese rango horario:
 
-![Captura 3 - Manejo de errores](evidencias/captura3-errores.png)
+![Captura 3.1 - Conflicto de horario HTTP 409](evidencias/error-409-fecha-hora.png)
+
+#### 3.2. Errores de validación de campos (`HTTP 422 Unprocessable Entity`)
+Muestra el mapeo de errores de validación de Pydantic debajo de los campos correspondientes en el formulario:
+
+![Captura 3.2 - Error de validación HTTP 422](evidencias/error-422.png)
+
+![Captura 3.3 - Error de validación de fecha HTTP 422](evidencias/error-fecha-422.png)
