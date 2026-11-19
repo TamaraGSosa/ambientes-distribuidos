@@ -1,0 +1,80 @@
+services:
+  postgres-primary:
+    image: postgres:16-alpine
+    container_name: tp8-postgres-primary
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_primary_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-tp8_db}
+      REPLICATION_USER: ${REPLICATION_USER:-replicator}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-replicator_pass}
+    ports:
+      - "${PRIMARY_PORT:-5433}:5432"
+    command:
+      - postgres
+      - -c
+      - listen_addresses=*
+      - -c
+      - wal_level=replica
+      - -c
+      - max_wal_senders=10
+      - -c
+      - max_replication_slots=10
+      - -c
+      - wal_keep_size=64MB
+      - -c
+      - hot_standby=on
+    volumes:
+      - postgres_primary_data:/var/lib/postgresql/data
+      - ./postgres/primary/01-init-primary.sh:/docker-entrypoint-initdb.d/01-init-primary.sh:ro
+      - ./postgres/primary/02-init-schema.sql:/docker-entrypoint-initdb.d/02-init-schema.sql:ro
+    networks:
+      - tp8-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-tp8_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  postgres-replica:
+    image: postgres:16-alpine
+    container_name: tp8-postgres-replica
+    restart: unless-stopped
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_primary_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-tp8_db}
+      REPLICATION_USER: ${REPLICATION_USER:-replicator}
+      REPLICATION_PASSWORD: ${REPLICATION_PASSWORD:-replicator_pass}
+      PRIMARY_HOST: postgres-primary
+      PRIMARY_PORT: 5432
+    ports:
+      - "${REPLICA_PORT:-5434}:5432"
+    entrypoint: ["/bin/sh", "/usr/local/bin/replica-entrypoint.sh"]
+    volumes:
+      - postgres_replica_data:/var/lib/postgresql/data
+      - ./postgres/replica/replica-entrypoint.sh:/usr/local/bin/replica-entrypoint.sh:ro
+    networks:
+      - tp8-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-tp8_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+volumes:
+  postgres_primary_data:
+    name: tp8_postgres_primary_data
+  postgres_replica_data:
+    name: tp8_postgres_replica_data
+
+networks:
+  tp8-network:
+    name: tp8-network
+    driver: bridge

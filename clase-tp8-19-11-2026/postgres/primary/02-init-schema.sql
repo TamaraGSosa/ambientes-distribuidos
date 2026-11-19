@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS records (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(120) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
