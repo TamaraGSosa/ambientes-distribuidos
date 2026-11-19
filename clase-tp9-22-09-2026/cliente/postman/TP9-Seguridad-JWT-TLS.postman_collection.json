@@ -1,0 +1,247 @@
+{
+  "info": {
+    "name": "TP9 - Seguridad en Aplicaciones Distribuidas (JWT y TLS)",
+    "description": "Colección de pruebas funcionales, autorización por roles y detección de tampering sobre HTTPS (https://localhost:3443).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:3443"
+    },
+    {
+      "key": "jwt_admin",
+      "value": ""
+    },
+    {
+      "key": "jwt_user",
+      "value": ""
+    },
+    {
+      "key": "jwt_tampered",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. POST /login (ADMIN)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('Retorna access_token', () => pm.expect(json.access_token).to.be.a('string'));",
+              "pm.collectionVariables.set('jwt_admin', json.access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "2. POST /login (USER)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200 OK', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.collectionVariables.set('jwt_user', json.access_token);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"usuario\",\n  \"password\": \"Usuario123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "3. GET /profile (Autorizado HTTPS - 200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_user}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["profile"]
+        }
+      }
+    },
+    {
+      "name": "4. GET /profile (Sin Token - 401)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 401 Unauthorized', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/profile",
+          "host": ["{{baseUrl}}"],
+          "path": ["profile"]
+        }
+      }
+    },
+    {
+      "name": "5. GET /admin (Rol USER - 403 Forbidden)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 403 Forbidden', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_user}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin"]
+        }
+      }
+    },
+    {
+      "name": "6. GET /admin (Rol ADMIN - 200 OK)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200 OK', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_admin}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin"]
+        }
+      }
+    },
+    {
+      "name": "7. GET /admin (Tampering Payload - 401)",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const token = pm.collectionVariables.get('jwt_user');",
+              "if (token) {",
+              "  const [header, payload, sig] = token.split('.');",
+              "  const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));",
+              "  decoded.rol = 'ADMIN';",
+              "  const alteredPayload = btoa(JSON.stringify(decoded)).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');",
+              "  pm.collectionVariables.set('jwt_tampered', `${header}.${alteredPayload}.${sig}`);",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 401 Unauthorized por firma inválida', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_tampered}}"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/admin",
+          "host": ["{{baseUrl}}"],
+          "path": ["admin"]
+        }
+      }
+    }
+  ]
+}

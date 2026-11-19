@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+
+# Certificados y claves privadas TLS (no versionar secretos)
+certs/*.key
+certs/*.pem
+certs/*.crt
+!certs/.gitkeep

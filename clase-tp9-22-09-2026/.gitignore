@@ -1,0 +1,10 @@
+# Archivos sensibles y dependencias de TP9
+.env
+**/.env
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+*.key
+*.pem
+*.crt
